@@ -6,11 +6,11 @@ app = apps.get_app_config('oneliners')
 
 class QuoteAdmin(admin.ModelAdmin):
     list_display = ('text', 'valid', 'likes')
-    list_filter = ('text', 'valid', 'likes')
+    list_filter = list_display
 
 
 for model_name, model in app.models.items():
-    exclude = ['baseuser_groups', 'baseuser_user_permissions']
+    exclude = ['baseuser_groups', 'baseuser_user_permissions', 'like', 'session']
     if model_name == 'quote':
         admin.site.register(model, QuoteAdmin)
     elif model_name not in exclude:
