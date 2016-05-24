@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.contrib import messages
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, Http404
 from django.core.urlresolvers import reverse
 
 import random
 
-from .models import Quote
 from .forms import *
 
 
@@ -17,7 +16,10 @@ def index(request):
 
     if request.method == 'GET':
         if 'id' in request.GET and 'key' in request.GET and request.GET['key'] == 'trynottobeacunt':
-            quote = Quote.objects.get(id=request.GET['id'])
+            try:
+                quote = Quote.objects.get(id=request.GET['id'])
+            except Quote.DoesNotExist:
+                return Http404
         else:
             quote = random_quote_text()
         context['likeform'] = LikeForm(
@@ -59,5 +61,7 @@ def add(request):
 
 def random_quote_text():
     quotes = Quote.objects.filter(valid=True)
-    quote = random.choice(quotes)
-    return quote
+    try:
+        return random.choice(quotes)
+    except IndexError:
+        return Http404
