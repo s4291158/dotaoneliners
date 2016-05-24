@@ -19,17 +19,15 @@ def index(request):
             try:
                 quote = Quote.objects.get(id=request.GET['id'])
             except Quote.DoesNotExist:
-                return Http404
+                raise Http404
         else:
             quote = random_quote_text()
 
-        try:
-            context['likeform'] = LikeForm(
-                sessionkey=request.session.session_key,
-                quote_id=quote.id
-            )
-        except AttributeError:
-            return Http404
+        context['likeform'] = LikeForm(
+            sessionkey=request.session.session_key,
+            quote_id=quote.id
+        )
+
         context['quote'] = quote
         return render(request, 'index.html', context)
 
@@ -68,4 +66,4 @@ def random_quote_text():
     try:
         return random.choice(quotes)
     except IndexError:
-        return
+        raise Http404
